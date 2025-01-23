@@ -17,7 +17,7 @@ public class UserDTO
     public required string Email { get; set; }
     public required string Password { get; set; }
     public required string Role { get; set; }
-    public string? Token { get; set; }
+    public string Token { get; set; }
     public bool Status { get; set; } = true;
     public virtual ICollection<TaskDTO> Tasks { get; set; }
 }

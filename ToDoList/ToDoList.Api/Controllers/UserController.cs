@@ -1,43 +1,104 @@
-﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace ToDoList.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 using ToDoList.Api.DTOs;
+using ToDoList.Service.Contracts;
+using Common;
+using global::AutoMapper;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("[controller]")]
 public class UserController : ControllerBase
 {
-    // GET: api/<UserController>
+    private readonly ILogger<UserController> _logger;
+    private readonly IUserService _userService;
+    private readonly IMapper _mapper;
+
+    public UserController(IUserService userService, ILogger<UserController> logger, IMapper mapper)
+    {
+        _logger = logger;
+        _userService = userService;
+        _mapper = mapper;
+    }
+
     [HttpGet]
-    public List<UserDTO> Get()
+    public async Task<ApiResponse<List<UserDTO>>> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new UserDTO()).ToList();
+        try
+        {
+            ApiResponse<List<Models.User>> result = await _userService.GetAllUsers();
+            return result.Code is Enums.ResponsesID.Successful
+                ? new ApiResponse<List<UserDTO>>(result.Code, result.Description, _mapper.Map<List<UserDTO>>(result.Structure))
+                : new ApiResponse<List<UserDTO>>(result.Code, result.Description, null);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<List<UserDTO>>(Enums.ResponsesID.Exception, ex.Message, null);
+        }
     }
 
-    // GET api/<UserController>/5
     [HttpGet("{id}")]
-    public UserDTO Get(Guid id)
+    public async Task<ApiResponse<UserDTO>> Get(Guid id)
     {
-        return new UserDTO();
+
+        try
+        {
+            ApiResponse<Models.User> result = await _userService.GetUserById(id);
+            return result.Code is Enums.ResponsesID.Successful
+                ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
+                : new ApiResponse<UserDTO>(result.Code, result.Description, null);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null);
+        }
     }
 
-    // POST api/<UserController>
     [HttpPost]
-    public void Post([FromBody] UserDTO user)
+    public async Task<ApiResponse<UserDTO>> Post([FromBody] UserDTO user)
     {
+        try
+        {
+            ApiResponse<Models.User> result = await _userService.CreateUser(_mapper.Map<Models.User>(user));
+            return result.Code is Enums.ResponsesID.Successful
+                ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
+                : new ApiResponse<UserDTO>(result.Code, result.Description, null);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null);
+        }
     }
 
-    // PUT api/<UserController>/5
     [HttpPut("{id}")]
-    public void Put(Guid id, [FromBody] UserDTO user)
+    public async Task<ApiResponse<UserDTO>> Put([FromBody] Guid id, [FromBody] UserDTO user)
     {
+        try
+        {
+            ApiResponse<Models.User> result = await _userService.UpdateUser(id, _mapper.Map<Models.User>(user));
+            return result.Code is Enums.ResponsesID.Successful
+                ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
+                : new ApiResponse<UserDTO>(result.Code, result.Description, null);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null);
+        }
     }
 
-    // DELETE api/<UserController>/5
     [HttpDelete("{id}")]
-    public void Delete(Guid id)
+    public async Task<ApiResponse<UserDTO>> Delete(Guid id)
     {
+        try
+        {
+            ApiResponse<Models.User> result = await _userService.DeleteUser(id);
+            return result.Code is Enums.ResponsesID.Successful
+                ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
+                : new ApiResponse<UserDTO>(result.Code, result.Description, null);
+        }
+        catch (Exception ex)
+        {
+            return new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null);
+        }
     }
 }

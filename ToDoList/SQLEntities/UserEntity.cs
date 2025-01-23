@@ -1,4 +1,4 @@
-﻿namespace ToDoList.Repository.Entities;
+﻿namespace SQLEntities;
 using Microsoft.EntityFrameworkCore;
 
 using System;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 [PrimaryKey("Id")]
-public class User
+public class UserEntity
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -21,5 +21,5 @@ public class User
     public required string Role { get; set; }
     public string? Token { get; set; }
     public bool Status { get; set; } = true;
-    public virtual ICollection<Task> Tasks { get; set; }
+    public virtual ICollection<TaskEntity> Tasks { get; set; }
 }
