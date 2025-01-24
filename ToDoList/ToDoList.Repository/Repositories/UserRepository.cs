@@ -43,7 +43,7 @@ public class UserRepository : IUserRepository
         {
             UserEntity userEntity = await _context.Users.FirstOrDefaultAsync(t => t.Id == id && t.Status);
             return userEntity is null
-                ? new ApiResponse<User>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null)
+                ? new ApiResponse<User>(Enums.ResponsesID.NotFound, "Usuario no encontrado", null)
                 : new ApiResponse<User>(Enums.ResponsesID.Successful, "Consulta Exitosa", _mapper.Map<User>(userEntity));
         }
         catch (Exception ex)
@@ -52,14 +52,14 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<ApiResponse<User>> CreateUser(User task)
+    public async Task<ApiResponse<User>> CreateUser(User user)
     {
         try
         {
-            UserEntity userEntity = _mapper.Map<UserEntity>(task);
+            UserEntity userEntity = _mapper.Map<UserEntity>(user);
             await _context.Users.AddAsync(userEntity);
             await _context.SaveChangesAsync();
-            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Tarea creada exitosamente", _mapper.Map<User>(userEntity));
+            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Usuario creado exitosamente", _mapper.Map<User>(userEntity));
         }
         catch (Exception ex)
         {
@@ -67,18 +67,26 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public async Task<ApiResponse<User>> UpdateUser(Guid id, User task)
+    public async Task<ApiResponse<User>> UpdateUser(Guid id, User user)
     {
         try
         {
-            UserEntity userEntity = _mapper.Map<UserEntity>(task);
+            UserEntity userEntity = _mapper.Map<UserEntity>(user);
+
+            
             UserEntity exist = await _context.Users.FirstOrDefaultAsync(t => t.Id == id && t.Status);
             if (exist is null) 
-                return new ApiResponse<User>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null);
-                
-            _context.Users.Update(userEntity);
+                return new ApiResponse<User>(Enums.ResponsesID.NotFound, "Usuario no encontrado o inactivado", null);
+
+            if (!string.IsNullOrEmpty(user.Name))
+                exist.Name = user.Name;
+            if (!string.IsNullOrEmpty(user.Email))
+                exist.Email = user.Email;
+            if (!string.IsNullOrEmpty(user.Password))
+                exist.Password = user.Password;
+            _context.Users.Update(exist);
             await _context.SaveChangesAsync();
-            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Tarea actualizada exitosamente", _mapper.Map<User>(userEntity));
+            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Usuario actualizada exitosamente", _mapper.Map<User>(userEntity));
         }
         catch (Exception ex)
         {
@@ -92,11 +100,11 @@ public class UserRepository : IUserRepository
         {
             UserEntity userEntity = await _context.Users.FirstOrDefaultAsync(t => t.Id == id && t.Status);
             if (userEntity is null)
-                return new ApiResponse<User>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null);
+                return new ApiResponse<User>(Enums.ResponsesID.NotFound, "Usuario no encontrado", null);
             userEntity.Status = false;
             _context.Users.Update(userEntity);
             await _context.SaveChangesAsync();
-            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Tarea eliminada exitosamente", _mapper.Map<User>(userEntity));
+            return new ApiResponse<User>(Enums.ResponsesID.Successful, "Usuario eliminado exitosamente", _mapper.Map<User>(userEntity));
         }
         catch (Exception ex)
         {

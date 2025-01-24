@@ -177,6 +177,8 @@ public class TaskRepository : ITaskRepository
             TaskEntity taskEntity = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == taskId && t.Status && !t.IsComplete && t.UserId == userId);
             if (taskEntity is null)
                 return new ApiResponse<Models.Task>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null);
+            if (taskEntity.UserId != userId)
+                return new ApiResponse<Models.Task>(Enums.ResponsesID.Error, "No tienes permisos para completar esta tarea", null);
             taskEntity.IsComplete = true;
             _context.Tasks.Update(taskEntity);
             await _context.SaveChangesAsync();
@@ -213,6 +215,8 @@ public class TaskRepository : ITaskRepository
             TaskEntity taskEntity = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == taskId && t.Status && t.UserId == userId);
             if (taskEntity is null)
                 return new ApiResponse<Models.Task>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null);
+            if (taskEntity.UserId != userId)
+                return new ApiResponse<Models.Task>(Enums.ResponsesID.Error, "No tienes permisos para modificar esta tarea", null);
             taskEntity.Name = name;
             _context.Tasks.Update(taskEntity);
             await _context.SaveChangesAsync();
@@ -231,6 +235,8 @@ public class TaskRepository : ITaskRepository
             TaskEntity taskEntity = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == taskId && t.Status && t.UserId == userId);
             if (taskEntity is null)
                 return new ApiResponse<Models.Task>(Enums.ResponsesID.NotFound, "Tarea no encontrada", null);
+            if(taskEntity.UserId != userId)
+                return new ApiResponse<Models.Task>(Enums.ResponsesID.Error, "No tienes permisos para eliminar esta tarea", null);
             taskEntity.Status = false;
             _context.Tasks.Update(taskEntity);
             await _context.SaveChangesAsync();

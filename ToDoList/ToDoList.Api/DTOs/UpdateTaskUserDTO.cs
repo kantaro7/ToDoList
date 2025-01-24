@@ -16,7 +16,11 @@ using System.Threading.Tasks;
 
 public class UpdateTaskUserDTO
 {
+    [Required]
     public Guid UserId { get; set; }
+    [Required]
+    [MaxLength(100)]
     public string Name { get; set; }
+    [Required]
     public Guid TaskId { get; set; }
 }

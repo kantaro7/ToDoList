@@ -78,10 +78,11 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = nameof(Enums.Roles.Admin))]
     [HttpPut]
-    public async Task<ActionResult> Put([FromBody] UserDTO user)
+    public async Task<ActionResult> Put([FromBody] UpdateUserDTO user)
     {
         try
         {
+            UserDTO userDTO = new() { Id = user.Id, Email = user.Email, Name = user.Name, Role = user.Role, Status = true, Password = user.Password };
             ApiResponse<Models.User> result = await _userService.UpdateUser(user.Id, _mapper.Map<Models.User>(user));
             return result.Code is Enums.ResponsesID.Successful
                 ? Ok(new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure)))

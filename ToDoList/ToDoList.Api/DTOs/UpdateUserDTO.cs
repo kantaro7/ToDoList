@@ -8,13 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-public class UserDTO
+public class UpdateUserDTO
 {
     [Required]
     public Guid Id { get; set; }
@@ -24,10 +25,7 @@ public class UserDTO
     public string Email { get; set; }
     [EnumDataType(typeof(Enums.Roles))]
     public Enums.Roles Role { get; set; }
-    public bool Status { get; set; } = true;
-    [JsonIgnore]
-    public virtual ICollection<TaskDTO> Tasks { get; set; }
-    public string Token { get; set; }
-    [JsonIgnore]
+    [MinLength(6)]
+    [AllowNull]
     public string Password { get; set; }
 }
