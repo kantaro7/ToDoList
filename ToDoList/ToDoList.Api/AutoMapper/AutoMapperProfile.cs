@@ -11,6 +11,7 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<TaskDTO, Task>().ReverseMap();
         CreateMap<UserDTO, User>().ReverseMap();
+        CreateMap<LoginDTO, Login>().ReverseMap();
         CreateMap<TaskEntity, Task>().ReverseMap();
         CreateMap<UserEntity, User>().ReverseMap();
     }

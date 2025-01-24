@@ -14,4 +14,10 @@ public class Enums
         Error = -1,
         Exception = -2,
     }
+
+    public enum Roles
+    {
+        Admin = 1,
+        Standard = 2,
+    }
 }

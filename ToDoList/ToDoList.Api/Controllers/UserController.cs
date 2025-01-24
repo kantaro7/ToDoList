@@ -5,6 +5,7 @@ using ToDoList.Api.DTOs;
 using ToDoList.Service.Contracts;
 using Common;
 using global::AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("[controller]")]
@@ -20,7 +21,7 @@ public class UserController : ControllerBase
         _userService = userService;
         _mapper = mapper;
     }
-
+    [Authorize(Roles = nameof(Enums.Roles.Admin))]
     [HttpGet]
     public async Task<ApiResponse<List<UserDTO>>> Get()
     {
@@ -37,6 +38,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = $"{nameof(Enums.Roles.Admin)},{nameof(Enums.Roles.Standard)}")]
     [HttpGet("{id}")]
     public async Task<ApiResponse<UserDTO>> Get(Guid id)
     {
@@ -54,12 +56,14 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = nameof(Enums.Roles.Admin))]
     [HttpPost]
-    public async Task<ApiResponse<UserDTO>> Post([FromBody] UserDTO user)
+    public async Task<ApiResponse<UserDTO>> Post([FromBody] CreateUserDTO user)
     {
         try
         {
-            ApiResponse<Models.User> result = await _userService.CreateUser(_mapper.Map<Models.User>(user));
+            UserDTO newUser = new() { Id = new Guid(), Email = user.Email, Name = user.Name, Role = user.Role, Status = true, Password = user.Password };
+            ApiResponse<Models.User> result = await _userService.CreateUser(_mapper.Map<Models.User>(newUser));
             return result.Code is Enums.ResponsesID.Successful
                 ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
                 : new ApiResponse<UserDTO>(result.Code, result.Description, null);
@@ -70,12 +74,13 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<ApiResponse<UserDTO>> Put([FromBody] Guid id, [FromBody] UserDTO user)
+    [Authorize(Roles = nameof(Enums.Roles.Admin))]
+    [HttpPut]
+    public async Task<ApiResponse<UserDTO>> Put([FromBody] UserDTO user)
     {
         try
         {
-            ApiResponse<Models.User> result = await _userService.UpdateUser(id, _mapper.Map<Models.User>(user));
+            ApiResponse<Models.User> result = await _userService.UpdateUser(user.Id, _mapper.Map<Models.User>(user));
             return result.Code is Enums.ResponsesID.Successful
                 ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
                 : new ApiResponse<UserDTO>(result.Code, result.Description, null);
@@ -86,6 +91,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize(Roles = nameof(Enums.Roles.Admin))]
     [HttpDelete("{id}")]
     public async Task<ApiResponse<UserDTO>> Delete(Guid id)
     {

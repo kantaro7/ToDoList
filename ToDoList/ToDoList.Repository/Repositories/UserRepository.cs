@@ -12,15 +12,16 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Common;
 using Models;
+using Microsoft.Extensions.Configuration;
 
 public class UserRepository : IUserRepository
 {
     private readonly IMapper _mapper;
     private readonly TDContext _context;
-    public UserRepository(IMapper autoMapper, TDContext context)
+    public UserRepository(IMapper autoMapper, IConfiguration configuration)
     {
         _mapper = autoMapper;
-        _context = context;
+        _context = new TDContext(configuration);
     }
 
     public async Task<ApiResponse<List<User>>> GetAllUsers()

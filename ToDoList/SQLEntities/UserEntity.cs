@@ -1,4 +1,7 @@
 ﻿namespace SQLEntities;
+
+using Common;
+
 using Microsoft.EntityFrameworkCore;
 
 using System;
@@ -18,8 +21,7 @@ public class UserEntity
     public required string Name { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
-    public required string Role { get; set; }
-    public string? Token { get; set; }
+    public required Enums.Roles Role { get; set; }
     public bool Status { get; set; } = true;
     public virtual ICollection<TaskEntity> Tasks { get; set; }
 }
