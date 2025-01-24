@@ -22,18 +22,27 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ApiResponse<UserDTO>> Login([FromBody] LoginDTO data)
+    public async Task<ActionResult> Login([FromBody] LoginDTO data)
     {
         try
         {
             ApiResponse<Models.User> result = await _authenticationService.Login(_mapper.Map<Models.Login>(data));
-            return result.Code is Enums.ResponsesID.Successful
-                ? new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure))
-                : new ApiResponse<UserDTO>(result.Code, result.Description, null);
+            if (result.Code is Enums.ResponsesID.Successful)
+            {
+                return Ok(new ApiResponse<UserDTO>(result.Code, result.Description, _mapper.Map<UserDTO>(result.Structure)));
+            }
+            else if(result.Code is Enums.ResponsesID.NotFound)
+            {
+                return NotFound(new ApiResponse<UserDTO>(result.Code, result.Description, null));
+            }
+            else
+            {
+                return BadRequest(new ApiResponse<UserDTO>(result.Code, result.Description, null));
+            }
         }
         catch (Exception ex)
         {
-            return new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null);
+            return BadRequest(new ApiResponse<UserDTO>(Enums.ResponsesID.Exception, ex.Message, null));
         }
     }
 }
